@@ -82,7 +82,7 @@ const CodeInput = React.forwardRef(
   (props: CodeInputProps, ref: React.ForwardedRef<{focus: () => void}>) => {
     const aceEditorRef = useRef<any>()
     const aceEditorId = useId()
-
+    const [isCboxChecked, setIsCboxChecked] = React.useState(false)
     const {
       onFocus,
       onChange,
@@ -183,6 +183,30 @@ const CodeInput = React.forwardRef(
       }
     }, [aceEditorRef, handleGutterMouseDown])
 
+    useEffect(() => {
+      const cBox = document.createElement('input')
+      cBox.setAttribute('type', 'checkbox')
+      cBox.setAttribute('id', 'toggle-remove-lines')
+      cBox.addEventListener('change', function () {
+        // save the state of the checkbox
+        setIsCboxChecked(cBox.checked)
+      })
+      const label = document.createElement('label')
+      label.setAttribute('for', 'toggle-remove-lines')
+      label.innerHTML = 'I am pasting code from Word'
+      const cBoxContainer = document.createElement('div')
+      cBoxContainer.style.display = 'flex'
+      cBoxContainer.style.alignItems = 'center'
+      cBoxContainer.style.gap = '0.5rem'
+      cBoxContainer.appendChild(cBox)
+      cBoxContainer.appendChild(label)
+      const editor = aceEditorRef.current.editor
+      // container has a lot of parents, so we need to go up a few levels
+      const editorEl = editor.container.parentNode.parentNode.parentNode.parentNode.parentNode
+      // add checkbox and label before the editor
+      editorEl.insertAdjacentElement('beforebegin', cBoxContainer)
+    }, [aceEditorRef])
+
     const handleEditorLoad = useCallback(
       (editor: any) => {
         editor?.on('guttermousedown', handleGutterMouseDown)
@@ -232,15 +256,40 @@ const CodeInput = React.forwardRef(
       }, [])
     }, [type])
 
+    function processString(inputString: string) {
+      // Regular expression to match sequences of newline characters
+      const newlineRegex = /\n+/g
+
+      // Replace each sequence of newline characters with half of them
+      const processedString = inputString.replace(newlineRegex, function (match) {
+        // If there's only one newline character, don't remove it
+        if (match.length === 1) {
+          return match
+        }
+        // Calculate the new length (half of the original length)
+        const newLength = Math.ceil(match.length / 2)
+        // Construct a string with the new length of newline characters
+        return '\n'.repeat(newLength)
+      })
+
+      return processedString
+    }
+
     const handleCodeChange = useCallback(
       (code: string) => {
         const path = PATH_CODE
         const fixedLanguage = type.options?.language
 
+        let newCode = code
+        if (isCboxChecked) {
+          // remove extra newlines
+          newCode = processString(code)
+        }
+
         onChange(
           PatchEvent.from([
             setIfMissing({_type: type.name, language: fixedLanguage}),
-            code ? set(code, path) : unset(path),
+            newCode ? set(newCode, path) : unset(path),
           ])
         )
       },
