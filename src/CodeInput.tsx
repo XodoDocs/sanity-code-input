@@ -83,6 +83,7 @@ const CodeInput = React.forwardRef(
     const aceEditorRef = useRef<any>()
     const aceEditorId = useId()
     const [isCboxChecked, setIsCboxChecked] = React.useState(false)
+
     const {
       onFocus,
       onChange,
@@ -190,7 +191,10 @@ const CodeInput = React.forwardRef(
       cBox.addEventListener('change', function () {
         // save the state of the checkbox
         setIsCboxChecked(cBox.checked)
+        localStorage.setItem('codeInput-isCboxChecked', cBox.checked.toString())
       })
+      cBox.checked = localStorage.getItem('codeInput-isCboxChecked') === 'true'
+      setIsCboxChecked(cBox.checked)
       const label = document.createElement('label')
       label.setAttribute('for', 'toggle-remove-lines')
       label.innerHTML = 'I am pasting code from Word'
@@ -293,7 +297,7 @@ const CodeInput = React.forwardRef(
           ])
         )
       },
-      [onChange, type]
+      [onChange, type, isCboxChecked]
     )
 
     const handleLanguageChange = useCallback(
