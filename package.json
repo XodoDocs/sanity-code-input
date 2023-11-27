@@ -1,5 +1,5 @@
 {
-  "name": "@sanity/code-input",
+  "name": "@pdftron/sanity-code-input",
   "version": "2.36.0",
   "description": "Ace editor for editing code",
   "keywords": [
@@ -14,11 +14,11 @@
   ],
   "homepage": "https://www.sanity.io/",
   "bugs": {
-    "url": "https://github.com/sanity-io/code-input/issues"
+    "url": "https://github.com/XodoDocs/sanity-code-input"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:sanity-io/code-input.git"
+    "url": "git@github.com:XodoDocs/sanity-code-input.git"
   },
   "license": "MIT",
   "author": "Sanity.io <hello@sanity.io>",
