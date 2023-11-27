@@ -49,6 +49,31 @@ const EditorContainer = styled(Card)`
   }
 `
 
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 4px;
+`
+
+const CheckboxLabel = styled.label`
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: ${({theme}) => theme.sanity.color.muted.default};
+`
+
+const CheckboxInput = styled.input`
+  margin: 0;
+  padding: 0;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid ${({theme}) => theme.sanity.color.base.focusRing};
+  border-radius: ${({theme}) => theme.sanity.radius[1]};
+  background-color: ${({theme}) => theme.sanity.color.base.bg};
+  box-shadow: inset 0 0 0 1px ${({theme}) => theme.sanity.color.border};
+  transition: all 150ms;
+`
+
 export interface CodeInputProps {
   compareValue?: CodeInputValue
   focusPath: Path
@@ -82,7 +107,9 @@ const CodeInput = React.forwardRef(
   (props: CodeInputProps, ref: React.ForwardedRef<{focus: () => void}>) => {
     const aceEditorRef = useRef<any>()
     const aceEditorId = useId()
-
+    const [isCboxChecked, setIsCboxChecked] = React.useState(() => {
+      return localStorage.getItem('codeInput-isCboxChecked') === 'true'
+    })
     const {
       onFocus,
       onChange,
@@ -232,19 +259,44 @@ const CodeInput = React.forwardRef(
       }, [])
     }, [type])
 
+    function processString(inputString: string) {
+      // Regular expression to match sequences of newline characters
+      const newlineRegex = /\n+/g
+
+      // Replace each sequence of newline characters with half of them
+      const processedString = inputString.replace(newlineRegex, function (match) {
+        // If there's only one newline character, don't remove it
+        if (match.length === 1) {
+          return match
+        }
+        // Calculate the new length (half of the original length)
+        const newLength = Math.ceil(match.length / 2)
+        // Construct a string with the new length of newline characters
+        return '\n'.repeat(newLength)
+      })
+
+      return processedString
+    }
+
     const handleCodeChange = useCallback(
       (code: string) => {
         const path = PATH_CODE
         const fixedLanguage = type.options?.language
 
+        let newCode = code
+        if (isCboxChecked) {
+          // remove extra newlines
+          newCode = processString(code)
+        }
+
         onChange(
           PatchEvent.from([
             setIfMissing({_type: type.name, language: fixedLanguage}),
-            code ? set(code, path) : unset(path),
+            newCode ? set(newCode, path) : unset(path),
           ])
         )
       },
-      [onChange, type]
+      [onChange, type, isCboxChecked]
     )
 
     const handleLanguageChange = useCallback(
@@ -361,7 +413,6 @@ const CodeInput = React.forwardRef(
       onBlur,
       value?.filename,
     ])
-
     const renderEditor = useCallback(() => {
       const fixedLanguage = type.options?.language
 
@@ -383,6 +434,20 @@ const CodeInput = React.forwardRef(
           compareValue={codeCompareValue}
         >
           <FormField label="Code" level={level + 1} __unstable_presence={codePresence}>
+            <CheckboxContainer>
+              <CheckboxInput
+                type="checkbox"
+                id="toggle-remove-lines"
+                checked={isCboxChecked}
+                onChange={(e) => {
+                  setIsCboxChecked(e.target.checked)
+                  localStorage.setItem('codeInput-isCboxChecked', e.target.checked.toString())
+                }}
+              />
+              <CheckboxLabel htmlFor="toggle-remove-lines">
+                I am pasting code from Word
+              </CheckboxLabel>
+            </CheckboxContainer>
             <EditorContainer radius={1} shadow={1} readOnly={readOnly}>
               <AceEditor
                 ref={aceEditorRef}
