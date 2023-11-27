@@ -107,7 +107,9 @@ const CodeInput = React.forwardRef(
   (props: CodeInputProps, ref: React.ForwardedRef<{focus: () => void}>) => {
     const aceEditorRef = useRef<any>()
     const aceEditorId = useId()
-    const [isCboxChecked, setIsCboxChecked] = React.useState(false)
+    const [isCboxChecked, setIsCboxChecked] = React.useState(() => {
+      return localStorage.getItem('codeInput-isCboxChecked') === 'true'
+    })
     const {
       onFocus,
       onChange,
@@ -207,11 +209,6 @@ const CodeInput = React.forwardRef(
         editor?.session?.removeListener('guttermousedown', handleGutterMouseDown)
       }
     }, [aceEditorRef, handleGutterMouseDown])
-
-    useEffect(() => {
-      const isChecked = localStorage.getItem('codeInput-isCboxChecked') === 'true'
-      setIsCboxChecked(isChecked)
-    }, [setIsCboxChecked])
 
     const handleEditorLoad = useCallback(
       (editor: any) => {
