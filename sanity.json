@@ -5,15 +5,15 @@
   },
   "parts": [
     {
-      "name": "part:@sanity/code-input/input/code",
+      "name": "part:@pdftron/sanity-code-input/input/code",
       "description": "An editor for code in sanity"
     },
     {
-      "implements": "part:@sanity/code-input/input/code",
+      "implements": "part:@pdftron/sanity-code-input/input/code",
       "path": "CodeInput"
     },
     {
-      "name": "part:@sanity/code-input/input/code/schema",
+      "name": "part:@pdftron/sanity-code-input/input/code/schema",
       "description": "An editor for code in sanity"
     },
     {
@@ -21,7 +21,7 @@
       "path": "schema"
     },
     {
-      "implements": "part:@sanity/code-input/input/code/schema",
+      "implements": "part:@pdftron/sanity-code-input/input/code/schema",
       "path": "deprecatedSchema"
     }
   ]

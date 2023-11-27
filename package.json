@@ -35,7 +35,6 @@
     "build": "tsc --declaration --emitDeclarationOnly && sanipack build",
     "clean": "rimraf lib",
     "lint": "eslint .",
-    "prepare": "husky install",
     "prepublishOnly": "npm run build",
     "watch": "sanipack build --watch"
   },
@@ -63,7 +62,6 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
     "prettier-plugin-packagejson": "^2.3.0",
