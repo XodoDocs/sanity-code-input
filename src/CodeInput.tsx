@@ -262,6 +262,7 @@ const CodeInput = React.forwardRef(
     function processString(inputString: string) {
       // Regular expression to match sequences of newline characters
       const newlineRegex = /\n+/g
+      const invisibleCharRegEx = /[\u200B-\u200D\uFEFF\u202A-\u202E\u202F]/g
 
       // Replace each sequence of newline characters with half of them
       const processedString = inputString.replace(newlineRegex, function (match) {
@@ -275,7 +276,7 @@ const CodeInput = React.forwardRef(
         return '\n'.repeat(newLength)
       })
 
-      return processedString
+      return processedString.replace(invisibleCharRegEx, '')
     }
 
     const handleCodeChange = useCallback(
